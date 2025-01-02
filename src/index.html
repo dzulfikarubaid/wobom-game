@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.io Room</title>
+</head>
+
+<body>
+    <h1>Socket.io Room Example</h1>
+
+    <input type="text" id="roomInput" placeholder="Enter room name">
+    <button id="joinButton">Join Room</button>
+    <button id="leaveButton">Leave Room</button>
+
+    <h2>Users in Room:</h2>
+    <ul id="usersList"></ul>
+
+    <script src="https://cdn.socket.io/4.7.1/socket.io.min.js"></script>
+    <script>
+        const socket = io('http://localhost:5001');
+        const roomInput = document.getElementById('roomInput');
+        const joinButton = document.getElementById('joinButton');
+        const leaveButton = document.getElementById('leaveButton');
+        const usersList = document.getElementById('usersList');
+
+        let currentRoom = null;
+
+        // Function to update users list
+        function updateUsersList(users) {
+            usersList.innerHTML = '';  // Clear the previous list
+            users.forEach(userId => {
+                const li = document.createElement('li');
+                li.textContent = `User ID: ${userId}`;
+                usersList.appendChild(li);
+            });
+        }
+
+        // Join room
+        joinButton.addEventListener('click', () => {
+            const roomName = roomInput.value.trim();
+            if (roomName) {
+                socket.emit('join-room', roomName, (response) => {
+                    if (response.success) {
+                        currentRoom = response.room;
+                        console.log(`Joined room: ${response.room}`);
+
+                        // After joining, fetch the list of users in the room
+                        socket.emit('get-users-in-room', currentRoom, (response) => {
+                            if (response.success) {
+                                updateUsersList(response.users);
+                            } else {
+                                console.log(response.message);
+                            }
+                        });
+                    }
+                });
+            } else {
+                alert("Please enter a room name!");
+            }
+        });
+
+        // Leave room
+        leaveButton.addEventListener('click', () => {
+            if (currentRoom) {
+                socket.emit('leave-room', (response) => {
+                    if (response.success) {
+                        currentRoom = null;
+                        usersList.innerHTML = ''; // Clear the users list when leaving
+                        console.log('Left the room');
+                    }
+                });
+            } else {
+                alert('You are not in any room!');
+            }
+        });
+
+        // Listen for users list update
+        socket.on('users-updated', (users) => {
+            updateUsersList(users);  // Update the UI when the list of users changes
+        });
+    </script>
+</body>
+
+</html>

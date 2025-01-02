@@ -1,0 +1,29 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wobom-game
+    ports:
+      - 5001:5001
+    volumes:
+      - .:/app
+    environment:
+      DATABASE_URL: mysql://root:password@mysql:3306/dev  # Gunakan port 3306 untuk MySQL
+      JWT_SECRET: secretGDFDWhhawvwsv22732
+      PORT: 5001
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: dev
+    ports:
+      - 3306:3306  # Gunakan port 3306 untuk MySQL
+    volumes:
+      - mysql_data:/var/lib/mysql  # Volume untuk data MySQL
+
+volumes:
+  mysql_data:  # Volume untuk menyimpan data MySQL secara persisten
