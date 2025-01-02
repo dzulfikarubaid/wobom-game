@@ -1,7 +1,7 @@
 import express, { response } from "express";
 import cors from "cors";
 import { Server } from "socket.io";
-import { createServer } from 'http';
+import { createServer } from 'https';
 import { fileURLToPath } from "url";
 import path from "path";
 import { PORT } from "./utilities/secureData.js";
@@ -67,16 +67,7 @@ io.on("connection", (socket) => {
                 return { username: user, lifes: 2 };
             });
             console.log(usersInGame)
-            // countdown = 13;
-            // clearInterval(intervalId);
-            // intervalId = setInterval(() => {
-            //     countdown -= 1;
-            //     io.to(room).emit('countdown', countdown); // Send updated countdown to all clients
-            //     if (countdown === 0) {
-            //         clearInterval(intervalId);
-            //         io.to(room).emit('countdown-end'); // Notify clients when countdown ends
-            //     }
-            // }, 1000);
+            
             callback({ success: true, message: "Game started", usersInGame: usersInGame });
         } else {
             callback({ success: false, message: "Room not found" });
@@ -98,20 +89,7 @@ io.on("connection", (socket) => {
 
     // Contoh di server (Node.js + socket.io)
     socket.on('sync', (data) => {
-        // countdown = 10;
-        // const room = data.urlPath;
-        // clearInterval(intervalId);
-        // intervalId = setInterval(() => {
-        //     countdown -= 1;
-        //     io.to(room).emit('countdown', countdown); // Send updated countdown to all clients
-        //     if (countdown === 0) {
-        //         clearInterval(intervalId);
-        //         io.to(room).emit('countdown-end'); // Notify clients when countdown ends
-        //     }
-        // }, 1000);
-        // Kirimkan update ke semua client yang terhubung
         io.to(data.urlPath).emit('sync-state', data);
-        // callback({ success: true });
     });
     socket.on("update-life", (data) => {
         // Update status life untuk semua pengguna
@@ -247,24 +225,6 @@ io.on("connection", (socket) => {
 
     // Handle user disconnect
     socket.on("disconnect", () => {
-        // if (currentRoom) {
-        //     socket.leave(currentRoom);
-        //     delete usersInRoomMap[socket.id];
-        //     const roomSockets = io.sockets.adapter.rooms.get(currentRoom);
-        //     const userSockets = roomSockets ? Array.from(roomSockets) : [];
-
-        //     io.to(currentRoom).emit("users-updated", userSockets);
-
-        //     // Check if the room is empty and remove it
-        //     let index = rooms.indexOf(currentRoom);
-        //     if (index !== -1) {
-        //         rooms.splice(index, 1);  // Remove room if no one is in it
-        //     }
-
-        //     currentRoom = null;  // Reset room when user disconnects
-
-        //     io.emit('update-users-in-room', getUsersInRoom());
-        // }
         for (let room in usersInRooms) {
             if (usersInRooms[room].length === 0) {
                 delete usersInRooms[room];
@@ -307,12 +267,7 @@ app.use(express.static(path.join(__dirname, "dist")));
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
-
 app.use("/api", routes)
-
-// Middleware for CORS and JSON handling
-
-// Start the server
-server.listen(PORT, () => {  // Use 'server.listen' since you're using a custom HTTP server
+server.listen(PORT, () => { 
     console.log("Server is running on http://localhost:5001");
 });
