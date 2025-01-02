@@ -12,10 +12,11 @@ const app = express();
 const server = createServer(app);  // Ensure you're using 'server' for listen
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5001",  // Allow frontend to connect
+        origin: "https://wobom-game.vercel.app",  // Allow frontend to connect
         methods: ["GET", "POST"],
         credentials: true,
-    }
+    },
+    addTrailingSlash: false
 });
 
 const users = {};  // Store usernames with their socket ids
@@ -299,7 +300,7 @@ app.use(express.json());  // Pastikan ini ada, untuk mem-parsing JSON body
 app.use(cookieParser());  // Untuk mem-parsing cookies, jika digunakan
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:5173', 'http://localhost:5001'],
+    origin: ['http://localhost:5173', 'https://wobom-game.vercel.app'],
 }));
 const __dirname = path.dirname(fileURLToPath(import.meta.url)); 
 app.use(express.static(path.join(__dirname, "dist")));
