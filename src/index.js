@@ -1,7 +1,7 @@
 import express, { response } from "express";
 import cors from "cors";
 import { Server } from "socket.io";
-import { createServer } from 'https';
+import { createServer } from 'http';
 import { fileURLToPath } from "url";
 import path from "path";
 import { PORT } from "./utilities/secureData.js";
@@ -268,6 +268,7 @@ app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "dist", "index.html"));
 });
 app.use("/api", routes)
+
 server.listen(PORT, () => { 
     console.log("Server is running on http://localhost:5001");
 });
